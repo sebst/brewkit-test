@@ -33,6 +33,7 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             -t ghcr.io/${{ github.repository }}:latest \
+            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}:cache \
             --push .
         env:
           DOCKER_BUILDKIT: 1
