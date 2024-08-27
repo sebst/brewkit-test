@@ -18,6 +18,8 @@ RUN     echo "vscode ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 USER    vscode
 
+RUN     pkgx +bk
+
 
 # Set the default shell to bash
 SHELL ["/bin/bash", "-c"]
