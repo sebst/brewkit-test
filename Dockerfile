@@ -2,13 +2,14 @@
 FROM pkgxdev/pkgx
 
 # # Install dependencies for Homebrew
-# RUN apt-get update && apt-get install -y \
-#     build-essential \
-#     curl \
-#     file \
-#     git \
-#     procps \
-#     && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    file \
+    git \
+    procps \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
 
 
 # Add user vscode
@@ -19,6 +20,8 @@ RUN     echo "vscode ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 USER    vscode
 
 RUN     pkgx +bk
+
+COPY    --chown=vscode ./build.sh /home/vscode/
 
 
 # Set the default shell to bash
