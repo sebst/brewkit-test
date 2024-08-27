@@ -32,8 +32,8 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/amd64 \
-            -t ghcr.io/${{ github.repository_owner }}/brewkit-builder:latest \
-            --cache-to=type=registry,ref=ghcr.io/${{ github.repository_owner }}/brewkit-builder:cache \
+            -t ghcr.io/${{ github.repository_owner }}/brewkit-test:latest \
+            --cache-to=type=registry,ref=ghcr.io/${{ github.repository_owner }}/brewkit-test:cache \
             --push .
         env:
           DOCKER_BUILDKIT: 1
