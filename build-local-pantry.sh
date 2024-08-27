@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o pipefail
+set -o nounset
+
+export BREWROOT="/workspaces/brewkit-test/pantry"
+
+readonly PACKAGE=$1
+readonly VERSION=$2
+readonly ARCH=`uname -m`
+
+pkgx bk build ${PACKAGE}=v${VERSION}
+pkgx bk test ${PACKAGE}=v${VERSION}
+
+
+# Normalize ARCH to "x86-64" or "aarch64"
+if [ "$ARCH" = "x86_64" ]; then
+    BK_ARCH="x86-64"
+elif [ "$ARCH" = "aarch64" ]; then
+    BK_ARCH="aarch64"
+fi
+
+
+readonly PACKAGE_DIR="/home/vscode/.local/share/brewkit/linux+${BK_ARCH}/${PACKAGE}/v${VERSION}/"
+readonly PACKAGE_DST="/tmp/"
+readonly PACKAGE_TAR_BALL_NAME="${PACKAGE}-${VERSION}_${ARCH}.tar.gz"
+
+# Create a .tar.gz file from PACKAGE_DIR and store it to PACKAGE_DST/PACKAGE_TAR_BALL_NAME
+tar -czf "${PACKAGE_DST}/${PACKAGE_TAR_BALL_NAME}" -C "${PACKAGE_DIR}" .
+
