@@ -21,7 +21,7 @@ elif [ "$ARCH" = "aarch64" ]; then
 fi
 
 
-readonly PACKAGE_DIR="/home/vscode/.pkgx/chezmoi.io/v2.52.1/${PACKAGE}/v${VERSION}/"
+readonly PACKAGE_DIR="/home/vscode/.pkgx/${PACKAGE}/v${VERSION}/"
 readonly PACKAGE_DST="/mnt/"
 readonly PACKAGE_TAR_BALL_NAME="${PACKAGE}-${VERSION}_${ARCH}.tar.gz"
 
