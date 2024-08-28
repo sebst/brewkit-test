@@ -13,9 +13,9 @@ jobs:
         run: |
           docker run --rm \
           -e GITHUB_TOKEN=$GITHUB_TOKEN \
-          -v $(pwd):/mnt \
+          -v $(pwd):/mnt:rw \
           ghcr.io/sebst/brewkit-test:latest \
-          /home/vscode/build.sh "chezmoi.io" "2.52.1"
+          bash -c "sudo chown -R vscode /mnt && /home/vscode/build.sh 'chezmoi.io' '2.52.1'"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: List files
