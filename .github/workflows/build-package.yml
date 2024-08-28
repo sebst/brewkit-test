@@ -21,3 +21,25 @@ jobs:
       - name: List files
         run: |
           ls -lah
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "2.52.1"
+          release_name: Release of "chezmoi.io" version "2.52.1"
+          body: |
+            Built by Actions
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./chezmoi.io-2.52.1_x86_64.tar.gz
+          asset_name: chezmoi.io-2.52.1_x86_64.tar.gz
+          asset_content_type: application/gzip
