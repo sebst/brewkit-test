@@ -1,0 +1,27 @@
+name: Sync `pkgx.dev` pantry
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Sync from `pkgx.dev`
+        run: |
+          PANTRY_TGZ_URL="https://dist.pkgx.dev/pantry.tgz"
+          DATE_NOW=$(date +"%Y%m%d")
+          SCRIPT_DIR=$(dirname $(realpath $0))
+          PANTRY_DIR="${SCRIPT_DIR}/pantry"
+          PANTRY_DIR_PKGX="${PANTRY_DIR}/pkgx.dev"
+          rm -rf "${PANTRY_DIR_PKGX}"
+          mkdir -p "${PANTRY_DIR_PKGX}"
+          curl -sL "$PANTRY_TGZ_URL" | tar -xz -C "$PANTRY_DIR_PKGX" --strip-components=1 --wildcards '*/projects/*'
+      - name: Commit changes
+        run: |
+          git config --global user.email "robot@bascodes.com"
+          git config --global user.name "Robot"
+          git add pantry/pkgx.dev
+          git commit -m "Sync `pkgx.dev` pantry"
+          git push
+          
