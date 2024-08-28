@@ -1,0 +1,43 @@
+distributable:
+  url: https://codeload.github.com/rustls/rustls-ffi/tar.gz/refs/tags/{{version.tag}}
+  strip-components: 1
+
+versions:
+  github: rustls/rustls-ffi/tags
+  strip: /v/
+
+build:
+  dependencies:
+    rust-lang.org: ^1.65
+    rust-lang.org/cargo: '*'
+  script: |
+    cargo install cbindgen
+    make DESTDIR={{prefix}}
+    make DESTDIR={{prefix}} install
+
+test:
+  dependencies:
+    curl.se: '*'
+  env:
+    ARGS:
+      - -lrustls
+    linux:
+      ARGS:
+        - -Wl,--gc-sections
+        - -lpthread
+        - -ldl
+    darwin:
+      ARGS:
+        - -Wl,-dead_strip
+        - -framework Security
+        - -framework Foundation
+    TESTFILES:
+      - client.c
+      - common.c
+      - common.h
+  script: |
+    for file in $TESTFILES; do
+      curl -O https://raw.githubusercontent.com/rustls/rustls-ffi/v{{ version }}/tests/$file
+    done
+    cc client.c common.c -o client $ARGS
+    CA_FILE=$SSL_CERT_FILE ./client tea.xyz 443 /
