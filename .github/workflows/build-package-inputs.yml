@@ -15,6 +15,7 @@ on:
 
 jobs:
   build:
+    name: Build Package ${{ inputs.package }} v${{ inputs.version }}
     runs-on: ubuntu-latest
     steps:
       - name: Setup Docker
