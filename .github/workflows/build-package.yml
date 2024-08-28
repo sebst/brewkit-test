@@ -11,7 +11,10 @@ jobs:
         timeout-minutes: 12
       - name: Run inside Docker image
         run: |
-          docker run ghcr.io/sebst/brewkit-test:latest --mount type=bind,source=$(pwd),target=/mnt /home/vscode/build.sh chezmoi.io 2.52.1
+          docker run ghcr.io/sebst/brewkit-test:latest \
+          --mount type=bind,source=$(pwd),target=/mnt \
+          -e GITHUB_TOKEN=${{ GITHUB_TOKEN }} \
+          /home/vscode/build.sh chezmoi.io 2.52.1
       - name: List files
         run: |
           ls -lah
