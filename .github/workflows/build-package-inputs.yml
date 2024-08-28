@@ -1,0 +1,56 @@
+name: Build Package (Inputs)
+on: 
+  workflow_dispatch:
+    inputs:
+      package: 
+        type: string
+        description: 'The package to build'
+        required: true
+        default: 'chezmoi.io'
+      version:
+        type: string
+        description: 'The version of the package to build'
+        required: true
+        default: '2.52.1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Docker
+        uses: docker-practice/actions-setup-docker@master
+        timeout-minutes: 12
+      - name: Run inside Docker image
+        run: |
+          docker run --rm \
+          -e GITHUB_TOKEN=$GITHUB_TOKEN \
+          -v $(pwd):/mnt:rw \
+          ghcr.io/sebst/brewkit-test:latest \
+          bash -c "sudo chown -R vscode /mnt && /home/vscode/build.sh '${{ inputs.package }}' '${{ inputs.version }}'"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: List files
+        run: |
+          ls -lah
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "${{ inputs.package }}-${{ inputs.version }}_x86_64"
+          release_name: Release of "${{ inputs.package }}" version "${{ inputs.version }}"
+          body: |
+            Built by Actions
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ inputs.package }}-${{ inputs.version }}_x86_64.tar.gz
+          asset_name: ${{ inputs.package }}-${{ inputs.version }}_x86_64.tar.gz
+          asset_content_type: application/gzip
