@@ -22,7 +22,7 @@ fi
 
 
 readonly PACKAGE_DIR="/home/vscode/.local/share/brewkit/linux+${BK_ARCH}/${PACKAGE}/v${VERSION}/"
-readonly PACKAGE_DST="/tmp/"
+readonly PACKAGE_DST="/mnt/"
 readonly PACKAGE_TAR_BALL_NAME="${PACKAGE}-${VERSION}_${ARCH}.tar.gz"
 
 # Create a .tar.gz file from PACKAGE_DIR and store it to PACKAGE_DST/PACKAGE_TAR_BALL_NAME
