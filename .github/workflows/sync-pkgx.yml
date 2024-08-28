@@ -10,14 +10,15 @@ jobs:
         uses: actions/checkout@v4
       - name: Sync from `pkgx.dev`
         run: |
-          PANTRY_TGZ_URL="https://dist.pkgx.dev/pantry.tgz"
-          DATE_NOW=$(date +"%Y%m%d")
-          SCRIPT_DIR=$(dirname $(realpath $0))
-          PANTRY_DIR="${SCRIPT_DIR}/pantry"
-          PANTRY_DIR_PKGX="${PANTRY_DIR}/pkgx.dev"
           rm -rf "${PANTRY_DIR_PKGX}"
           mkdir -p "${PANTRY_DIR_PKGX}"
           curl -sL "$PANTRY_TGZ_URL" | tar -xz -C "$PANTRY_DIR_PKGX" --strip-components=1 --wildcards '*/projects/*'
+        env:
+          PANTRY_TGZ_URL: "https://dist.pkgx.dev/pantry.tgz"
+          PANTRY_DIR_PKGX: "./pantry/pkgx.dev"
+      - name: List files
+        run: |
+          ls -lah pantry/pkgx.dev
       - name: Commit changes
         run: |
           git config --global user.email "robot@bascodes.com"
