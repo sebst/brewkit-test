@@ -4,6 +4,7 @@ on:
 
 jobs:
   sync:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,4 +25,3 @@ jobs:
           git add pantry/pkgx.dev
           git commit -m "Sync `pkgx.dev` pantry"
           git push
-          
