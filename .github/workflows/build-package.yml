@@ -27,7 +27,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "2.52.1"
+          tag_name: "chezmoi.io-2.52.1_x86_64"
           release_name: Release of "chezmoi.io" version "2.52.1"
           body: |
             Built by Actions
