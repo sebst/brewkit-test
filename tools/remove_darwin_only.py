@@ -42,11 +42,21 @@ def remove_darwin_only():
     pkg_names = get_package_names_from_pantry()
     for pkg_name in pkg_names:
         pkg_info = get_package_info_pantry(pkg_name)
+        delete = False
         if pkg_info.get('platforms'):
-            if 'darwin' in pkg_info.get('platforms', []):
-                if ('linux/x86-64' not in pkg_info.get('platforms', []) and 'linux/aarch64' not in pkg_info.get('platforms', [])) and ('linux' in pkg_info.get('platforms', [])):
-                    print(f"Removing {pkg_name} from pantry")
-                    os.system(f"rm -rf {os.path.join(PANTRY_PKGX, 'projects', pkg_name)}")
+            delete = True
+            platforms = pkg_info.get('platforms', [])
+            if platforms == 'linux':
+                delete = False
+            for platform in platforms:
+                os_name = platform.split('/')[0]
+                if os_name == 'linux':
+                    delete = False
+                    break
+        if delete:
+            print(f"Deleting {pkg_name}, {pkg_info.get('platforms')=}")
+            # os.system(f"rm -rf {os.path.join(PANTRY_PKGX, 'projects', pkg_name)}")
+                    
 
 
 def main():
