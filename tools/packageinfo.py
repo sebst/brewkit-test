@@ -27,9 +27,32 @@ def get_package_info_pantry(pkg_name, pantry=PANTRY_PKGX):
             pkg_info = load(f, Loader=Loader)
     return pkg_info
 
+def package_supports_arch(pkg_name, arch):
+    arch = arch.lower()
+    pkg_info = get_package_info_pantry(pkg_name)
+    if pkg_info.get('platforms'):
+        platforms = pkg_info.get('platforms', [])
+        if platforms == 'linux':
+            return True
+        if platforms == ['linux']:
+            return True
+        if platforms == f'linux/{arch}':
+            return True
+        if platforms == [f'linux/{arch}']:
+            return True
+        for platform in platforms:
+            arch_name = platform.split('/')[1]
+            if arch_name == arch:
+                return True
+        return False
+    else:
+        return True
+
 def get_package_info_dist(pkg_name, dist_api=DIST_PKGX_API_BASE_URL):
     pkg_info = {}
     for arch in ARCHS:
+        if not package_supports_arch(pkg_name, arch):
+            continue
         pkg_info[arch] = {}
         versions = []
         url = f"{dist_api}/{pkg_name}/linux/{arch}/versions.txt"
