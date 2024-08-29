@@ -19,6 +19,8 @@ jobs:
       - name: Run tools/packageinfo.py
         run: |
           cd tools
+          rm -rf db.json
+          rm -rf db-minified.json
           python packageinfo.py
       - name: Commit changes
         run: |

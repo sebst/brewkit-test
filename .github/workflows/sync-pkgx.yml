@@ -1,6 +1,8 @@
 name: Sync `pkgx.dev` pantry
 on:
   workflow_dispatch:
+  schedule: # Daily at 00:00 UTC
+    - cron: '0 0 * * *'
 
 jobs:
   sync:
@@ -8,6 +10,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tools/requirements.txt
       - name: Sync from `pkgx.dev`
         run: |
           rm -rf "${PANTRY_DIR_PKGX}"
@@ -16,9 +26,9 @@ jobs:
         env:
           PANTRY_TGZ_URL: "https://dist.pkgx.dev/pantry.tgz"
           PANTRY_DIR_PKGX: "./pantry/pkgx.dev"
-      - name: List files
+      - name: Remoce Darwin Only Packages
         run: |
-          ls -lah pantry/pkgx.dev
+          python tools/remove_darwin_only.py
       - name: Commit changes
         run: |
           git config --global user.email "robot@bascodes.com"
