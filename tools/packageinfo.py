@@ -41,9 +41,12 @@ def package_supports_arch(pkg_name, arch):
         if platforms == [f'linux/{arch}']:
             return True
         for platform in platforms:
-            arch_name = platform.split('/')[1]
-            if arch_name == arch:
-                return True
+            try:
+                arch_name = platform.split('/')[1]
+                if arch_name == arch:
+                    return True
+            except:
+                pass
         return False
     else:
         return True
