@@ -55,7 +55,7 @@ def remove_darwin_only():
                     break
         if delete:
             print(f"Deleting {pkg_name}, {pkg_info.get('platforms')=}")
-            # os.system(f"rm -rf {os.path.join(PANTRY_PKGX, 'projects', pkg_name)}")
+            os.system(f"rm -rf {os.path.join(PANTRY_PKGX, 'projects', pkg_name)}")
                     
 
 
