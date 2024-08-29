@@ -1,0 +1,505 @@
+{
+    "mozilla.org/nss": {
+        "pantry": {
+            "distributable": {
+                "url": "https://ftp.mozilla.org/pub/security/nss/releases/NSS_{{version.major}}_{{version.minor}}_RTM/src/nss-{{version.marketing}}.tar.gz",
+                "strip-components": 1
+            },
+            "versions": [
+                3.92
+            ],
+            "dependencies": {
+                "mozilla.org/nspr": "*",
+                "sqlite.org": "*",
+                "zlib.net": "*"
+            },
+            "build": {
+                "dependencies": {
+                    "linux": {
+                        "gnu.org/gcc": "*",
+                        "gnu.org/make": "*"
+                    },
+                    "darwin/aarch64": {
+                        "llvm.org": "*"
+                    }
+                },
+                "script": [
+                    {
+                        "run": "sed -i.bak 's|-install_name @executable_path|-install_name {{prefix}}/lib|g' coreconf/Darwin.mk\nrm coreconf/Darwin.mk.bak\nsed -i.bak 's|@executable_path|{{prefix}}/lib|g' lib/freebl/config.mk\nrm lib/freebl/config.mk.bak\nmake all $ARGS\n",
+                        "working-directory": "nss"
+                    },
+                    {
+                        "run": "mkdir -p bin lib/pkgconfig include/dbm include/nss\ncat <<< \"$PC_FILE\" > lib/pkgconfig/nss.pc\n",
+                        "working-directory": "{{prefix}}"
+                    },
+                    "cat <<< \"$CONFIG_FILE\" > ./dist/nss-config",
+                    "install ./dist/nss-config {{prefix}}/bin/",
+                    "install ./dist/$(uname)*/bin/* {{prefix}}/bin/",
+                    "install ./dist/$(uname)*/lib/* {{prefix}}/lib/",
+                    "install ./dist/public/dbm/* {{prefix}}/include/dbm/",
+                    "install ./dist/public/nss/* {{prefix}}/include/nss/"
+                ],
+                "env": {
+                    "linux": {
+                        "CC": "{{deps.gnu.org/gcc.prefix}}/bin/gcc"
+                    },
+                    "darwin/aarch64": {
+                        "CC": "{{deps.llvm.org.prefix}}/bin/clang"
+                    },
+                    "ARGS": [
+                        "BUILD_OPT=1",
+                        "NSS_ALLOW_SSLKEYLOGFILE=1",
+                        "NSS_DISABLE_GTESTS=1",
+                        "NSS_USE_SYSTEM_SQLITE=1",
+                        "NSPR_INCLUDE_DIR={{deps.mozilla.org/nspr.prefix}}/include/nspr",
+                        "NSPR_LIB_DIR={{deps.mozilla.org/nspr.prefix}}/lib",
+                        "USE_64=1"
+                    ],
+                    "CONFIG_FILE": "#!/bin/sh\nfor opt; do :; done\ncase \"\\$opt\" in\n  --version) opt=\"--modversion\";;\n  --cflags|--libs) ;;\n  *) exit 1;;\nesac\npkg-config \"\\$opt\" nss\n",
+                    "PC_FILE": "prefix=\\${pcfiledir}/../..\nexec_prefix=\\${prefix}\nlibdir=\\${exec_prefix}/lib\nincludedir=\\${prefix}/include/nss\n\nName: NSS\nDescription: Mozilla Network Security Services\nVersion: {{version}}\nRequires: nspr >= 4.12\nLibs: -L\\${libdir} -lnss3 -lnssutil3 -lsmime3 -lssl3\nCflags: -I\\${includedir}\n"
+                }
+            },
+            "provides": [
+                "bin/addbuiltin",
+                "bin/certutil",
+                "bin/crmftest",
+                "bin/ecperf",
+                "bin/listsuites",
+                "bin/multinit",
+                "bin/ocspresp",
+                "bin/p7verify",
+                "bin/pk12util",
+                "bin/remtest",
+                "bin/secmodtest",
+                "bin/ssltap",
+                "bin/vfychain",
+                "bin/atob",
+                "bin/chktest",
+                "bin/dbtest",
+                "bin/encodeinttest",
+                "bin/nonspr10",
+                "bin/oidcalc",
+                "bin/pk11ectest",
+                "bin/pk1sign",
+                "bin/rsaperf",
+                "bin/selfserv",
+                "bin/strsclnt",
+                "bin/vfyserv",
+                "bin/baddbdir",
+                "bin/cmsutil",
+                "bin/derdump",
+                "bin/fbectest",
+                "bin/makepqg",
+                "bin/nss-config",
+                "bin/p7content",
+                "bin/pk11gcmtest",
+                "bin/pkix-errcodes",
+                "bin/rsapoptst",
+                "bin/shlibsign",
+                "bin/symkeyutil",
+                "bin/bltest",
+                "bin/conflict",
+                "bin/dertimetest",
+                "bin/fipstest",
+                "bin/mangle",
+                "bin/nss-policy-check",
+                "bin/p7env",
+                "bin/pk11importtest",
+                "bin/pp",
+                "bin/sdbthreadtst",
+                "bin/signtool",
+                "bin/tstclnt",
+                "bin/btoa",
+                "bin/crlutil",
+                "bin/digest",
+                "bin/httpserv",
+                "bin/modutil",
+                "bin/ocspclnt",
+                "bin/p7sign",
+                "bin/pk11mode",
+                "bin/pwdecrypt",
+                "bin/sdrtest",
+                "bin/signver",
+                "bin/validation"
+            ],
+            "test": {
+                "dependencies": {
+                    "freedesktop.org/pkg-config": "*"
+                },
+                "script": [
+                    "pkg-config --modversion nss | grep {{version}}",
+                    "certutil -N -d ./ -f passwd",
+                    "certutil -L -d ./ | grep \"Certificate Nickname\""
+                ]
+            }
+        },
+        "dist": {
+            "x86-64": {
+                "versions": {
+                    "3.92.0": {
+                        "url": "https://dist.pkgx.dev//mozilla.org/nss/linux/x86-64/v3.92.0.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//mozilla.org/nss/linux/x86-64/v3.92.0.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//mozilla.org/nss/linux/x86-64/v3.92.0.tar.gz.sha256sum",
+                        "sha256sum": "2b0aefa663bdf6e26601097426666121c5c93fdb2e817f62a547a406d58ad5db",
+                        "size": 7749402
+                    }
+                }
+            },
+            "aarch64": {
+                "versions": {
+                    "3.92.0": {
+                        "url": "https://dist.pkgx.dev//mozilla.org/nss/linux/aarch64/v3.92.0.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//mozilla.org/nss/linux/aarch64/v3.92.0.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//mozilla.org/nss/linux/aarch64/v3.92.0.tar.gz.sha256sum",
+                        "sha256sum": "86ae120022e9200f54f6fc24f66875bd58080505eca5a3bf4a6355fbf25a4f54",
+                        "size": 7860124
+                    }
+                }
+            }
+        }
+    },
+    "mozilla.org/mozjpeg": {
+        "pantry": {
+            "distributable": {
+                "url": "https://github.com/mozilla/mozjpeg/archive/v{{version}}.tar.gz",
+                "strip-components": 1
+            },
+            "versions": {
+                "github": "mozilla/mozjpeg"
+            },
+            "dependencies": {
+                "libpng.org": "^1"
+            },
+            "build": {
+                "dependencies": {
+                    "cmake.org": "^3",
+                    "nasm.us": "^2",
+                    "libpng.org": "^1"
+                },
+                "working-directory": "build",
+                "script": "cmake .. $ARGS\nmake install \n",
+                "env": {
+                    "ARGS": [
+                        "-DCMAKE_INSTALL_PREFIX={{ prefix }}"
+                    ],
+                    "linux/x86-64": {
+                        "ARGS": [
+                            "-DCMAKE_C_FLAGS=-fPIC",
+                            "-DCMAKE_CXX_FLAGS=-fPIC",
+                            "-DCMAKE_EXE_LINKER_FLAGS=-pie"
+                        ]
+                    }
+                }
+            },
+            "provides": [
+                "bin/cjpeg",
+                "bin/djpeg",
+                "bin/jpegtran",
+                "bin/rdjpgcom",
+                "bin/tjbench",
+                "bin/wrjpgcom"
+            ],
+            "test": {
+                "script": "jpegtran -crop 1x1 -transpose -optimize -outfile out.jpg fixture.jpeg"
+            }
+        },
+        "dist": {
+            "x86-64": {
+                "versions": {
+                    "4.0.3": {
+                        "url": "https://dist.pkgx.dev//mozilla.org/mozjpeg/linux/x86-64/v4.0.3.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//mozilla.org/mozjpeg/linux/x86-64/v4.0.3.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//mozilla.org/mozjpeg/linux/x86-64/v4.0.3.tar.gz.sha256sum",
+                        "sha256sum": "2c687bc28696529dbe11c4b833674fe515abd56709e6e67c57ea4debdfd0e8ed",
+                        "size": 1105990
+                    }
+                }
+            },
+            "aarch64": {
+                "versions": {
+                    "4.0.3": {
+                        "url": "https://dist.pkgx.dev//mozilla.org/mozjpeg/linux/aarch64/v4.0.3.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//mozilla.org/mozjpeg/linux/aarch64/v4.0.3.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//mozilla.org/mozjpeg/linux/aarch64/v4.0.3.tar.gz.sha256sum",
+                        "sha256sum": "bbcb3cd10f1ea9c0d993983389b54942e9ac96d90089e438aefa0f003b36af7d",
+                        "size": 988731
+                    }
+                }
+            }
+        }
+    },
+    "mozilla.org/nspr": {
+        "pantry": {
+            "distributable": {
+                "url": "https://archive.mozilla.org/pub/nspr/releases/v{{version}}/src/nspr-{{version}}.tar.gz",
+                "strip-components": 1
+            },
+            "versions": {
+                "url": "https://archive.mozilla.org/pub/nspr/releases/",
+                "match": "v\\d+\\.\\d+\\.\\d+\\",
+                "strip": "/^v-/"
+            },
+            "build": {
+                "script": [
+                    {
+                        "run": "sed -i.bak 's|@executable_path|{{prefix}}/lib|g' configure\nrm configure.bak\n",
+                        "if": "darwin",
+                        "working-directory": "nspr"
+                    },
+                    "./nspr/configure $ARGS",
+                    "make --jobs {{ hw.concurrency }}",
+                    "make --jobs {{ hw.concurrency }} install",
+                    {
+                        "run": "mv nspr/* .\nrmdir nspr\nln -s . nspr\n",
+                        "working-directory": "${{prefix}}/include"
+                    }
+                ],
+                "env": {
+                    "ARGS": [
+                        "--prefix=\"{{prefix}}\"",
+                        "--disable-debug",
+                        "--enable-strip",
+                        "--with-pthreads",
+                        "--enable-ipv6",
+                        "--enable-64bit"
+                    ],
+                    "darwin": {
+                        "ARGS": [
+                            "--enable-macos-target=$(sw_vers -productVersion)"
+                        ]
+                    }
+                }
+            },
+            "provides": [
+                "bin/nspr-config"
+            ],
+            "test": {
+                "script": "nspr-config --version | grep {{version}}"
+            }
+        },
+        "dist": {
+            "x86-64": {
+                "versions": {
+                    "4.34.1": {
+                        "url": "https://dist.pkgx.dev//mozilla.org/nspr/linux/x86-64/v4.34.1.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//mozilla.org/nspr/linux/x86-64/v4.34.1.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//mozilla.org/nspr/linux/x86-64/v4.34.1.tar.gz.sha256sum",
+                        "sha256sum": "0d3629fe707672119584cc584d4d0a4e78808812594b6e2a3b10130e75ae1f7b",
+                        "size": 386660
+                    }
+                }
+            },
+            "aarch64": {
+                "versions": {
+                    "4.34.1": {
+                        "url": "https://dist.pkgx.dev//mozilla.org/nspr/linux/aarch64/v4.34.1.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//mozilla.org/nspr/linux/aarch64/v4.34.1.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//mozilla.org/nspr/linux/aarch64/v4.34.1.tar.gz.sha256sum",
+                        "sha256sum": "c6716a040dc1b4925252f79301d0724a8f25772e3f2d2916bd91e8796abd656d",
+                        "size": 405269
+                    }
+                }
+            }
+        }
+    },
+    "nim-lang.org": {
+        "pantry": {
+            "distributable": {
+                "url": "https://nim-lang.org/download/nim-{{ version }}.tar.xz",
+                "strip-components": 1
+            },
+            "versions": {
+                "github": "nim-lang/Nim/tags"
+            },
+            "provides": [
+                "bin/nim",
+                "bin/nim_dbg",
+                "bin/testament",
+                "bin/nimsuggest",
+                "bin/nimgrep",
+                "bin/nim-gdb",
+                "bin/atlas",
+                "bin/nimpretty",
+                "bin/nimble"
+            ],
+            "dependencies": {
+                "gnu.org/gcc": "*",
+                "pcre.org": "*",
+                "openssl.org": "*"
+            },
+            "build": {
+                "dependencies": {
+                    "git-scm.org": "*"
+                },
+                "script": [
+                    "sh build.sh",
+                    "./bin/nim c koch",
+                    "./koch boot -d:release",
+                    "./koch tools",
+                    "./install.sh {{ prefix }}",
+                    {
+                        "run": "rm -rf nim/compiler\ncp -r nim/* .\nrm -rf nim\n",
+                        "working-directory": "${{prefix}}"
+                    },
+                    {
+                        "run": "cp $BINS {{ prefix }}/bin/",
+                        "working-directory": "bin"
+                    }
+                ],
+                "env": {
+                    "BINS": [
+                        "atlas",
+                        "nim",
+                        "nim-gdb",
+                        "nim_dbg",
+                        "nimble",
+                        "nimgrep",
+                        "nimpretty",
+                        "nimsuggest",
+                        "testament"
+                    ]
+                }
+            },
+            "test": {
+                "script": "mv $FIXTURE hello.nim\nnim r hello.nim\n",
+                "fixture": "echo \"Hello World\"\n"
+            }
+        },
+        "dist": {
+            "x86-64": {
+                "versions": {
+                    "1.6.14": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.14.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.14.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.14.tar.gz.sha256sum",
+                        "sha256sum": "d082674c3d67e3bc9c2941b886ac11baa7d9b45c90d404dff56391f9c4fe6d36",
+                        "size": 11310647
+                    },
+                    "1.6.16": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.16.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.16.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.16.tar.gz.sha256sum",
+                        "sha256sum": "072039f65f4e9b5712fb54a4d18132763c62af87fb95cd2917dc3046f4cb4406",
+                        "size": 11338652
+                    },
+                    "1.6.18": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.18.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.18.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.18.tar.gz.sha256sum",
+                        "sha256sum": "69670c4f468a397ce56860a61634710c8144eac2c03e0ba216abd0ba0c9c2be1",
+                        "size": 11352283
+                    },
+                    "1.6.20": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.20.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.20.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v1.6.20.tar.gz.sha256sum",
+                        "sha256sum": "992f341df91278e528a9957141288f256bc83aeea22a6241427d2ea8ce0fe69f",
+                        "size": 11376613
+                    },
+                    "2.0.0": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.0.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.0.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.0.tar.gz.sha256sum",
+                        "sha256sum": "e3259f5fde96a761a2f0cc8f30ccb175c31f2290ac8056d2841539144f1a8d71",
+                        "size": 14248727
+                    },
+                    "2.0.2": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.2.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.2.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.2.tar.gz.sha256sum",
+                        "sha256sum": "2282e174f6834117cf69dfa919d3a81a4525621ad1b9e361b91da23fd5a210e4",
+                        "size": 14298968
+                    },
+                    "2.0.4": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.4.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.4.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.4.tar.gz.sha256sum",
+                        "sha256sum": "891b4046e7b364bf68775ab24542afb0ab9f5887261b0a810159aacfeae011a9",
+                        "size": 14336148
+                    },
+                    "2.0.6": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.6.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.6.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.6.tar.gz.sha256sum",
+                        "sha256sum": "a26236affc137e48dc96d328e9e8e24058e4e012f4f50f5a8e5ae957faec0b4b",
+                        "size": 14603414
+                    },
+                    "2.0.8": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.8.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.8.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/x86-64/v2.0.8.tar.gz.sha256sum",
+                        "sha256sum": "9b5d6980b09c966b6acc247e576db091e841fdcf8e0832356ab5adb4d5563aaa",
+                        "size": 14669916
+                    }
+                }
+            },
+            "aarch64": {
+                "versions": {
+                    "1.6.14": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.14.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.14.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.14.tar.gz.sha256sum",
+                        "sha256sum": "f0f0dd1ee0a9c42b34d020245c60ac136ad4b44d7492acf1e55ba2abdae44e6e",
+                        "size": 11032654
+                    },
+                    "1.6.16": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.16.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.16.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.16.tar.gz.sha256sum",
+                        "sha256sum": "d28ffd33333af8bed0342090bd2ac7ebf5e5c506bf136b06a9c63aa90404ebe8",
+                        "size": 11060189
+                    },
+                    "1.6.18": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.18.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.18.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.18.tar.gz.sha256sum",
+                        "sha256sum": "d56ea43873110558821fa5ffa4df638049826393e7c36094b47d28fe55d7e906",
+                        "size": 11074214
+                    },
+                    "1.6.20": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.20.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.20.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v1.6.20.tar.gz.sha256sum",
+                        "sha256sum": "2868001967ba8d1f1861133cce224c8ae5038f507c811941c41f35f5c5bbc866",
+                        "size": 11092542
+                    },
+                    "2.0.0": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.0.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.0.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.0.tar.gz.sha256sum",
+                        "sha256sum": "2df2c07e8d7ca2b884a0ca899f4cf81f9a2954657b1318d21f2c576c5c0bfb28",
+                        "size": 13350267
+                    },
+                    "2.0.2": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.2.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.2.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.2.tar.gz.sha256sum",
+                        "sha256sum": "23dd1e7afbdc3e806853c16e688c7f9e5e2fda3b279494bad1c18dee1303d94e",
+                        "size": 13409717
+                    },
+                    "2.0.4": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.4.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.4.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.4.tar.gz.sha256sum",
+                        "sha256sum": "923fc11f59f32c8c63798f4f04880e90c9a3e9af6b8d9e3fa61badc11a6a3f07",
+                        "size": 13445614
+                    },
+                    "2.0.6": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.6.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.6.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.6.tar.gz.sha256sum",
+                        "sha256sum": "3cfe404419bd3ecaea5c8cfbe1e434a633a8a5bc6402ed9038afdd7ea785fd19",
+                        "size": 13714674
+                    },
+                    "2.0.8": {
+                        "url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.8.tar.gz",
+                        "asc_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.8.tar.gz.asc",
+                        "sha256sum_url": "https://dist.pkgx.dev//nim-lang.org/linux/aarch64/v2.0.8.tar.gz.sha256sum",
+                        "sha256sum": "0f08c6b19fa576c0a2af7a75d48dadd3cabbdaaa3200596edfc87da939e71ef7",
+                        "size": 13803994
+                    }
+                }
+            }
+        }
+    }
+}
