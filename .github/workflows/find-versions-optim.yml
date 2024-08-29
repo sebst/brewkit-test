@@ -29,5 +29,5 @@ jobs:
           git config --global user.email "robot@bascodes.com"
           git config --global user.name "Robot"
           git add .
-          git commit -m "Sync `pkgx.dev` pantry"
+          git commit -m "Sync `pkgx.dev` pantry" || exit 0
           git push
