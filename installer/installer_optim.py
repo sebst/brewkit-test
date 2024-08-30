@@ -6,6 +6,8 @@ import tempfile
 import hashlib
 from functools import cache
 from dataclasses import dataclass
+import datetime
+import uuid
 
 import aiohttp
 
@@ -17,6 +19,9 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 DST_DIR = os.path.join(SCRIPT_DIR, 'packages')
 if not os.path.exists(DST_DIR):
     os.makedirs(DST_DIR)
+
+
+SESSION_ID = str(uuid.uuid4().hex)
 
 
 @dataclass
@@ -31,6 +36,23 @@ class Dependency:
 def get_db():
     with open(os.path.join(SCRIPT_DIR, '..', 'tools', '_optim_db-minified.json')) as f:
         return json.load(f)
+
+
+def get_system_state():
+    try:
+        with open(os.path.join(SCRIPT_DIR, 'system-state.json')) as f:
+            return json.load(f)
+    except:
+        return {}
+
+
+def add_system_state(session_id, action, payload):
+    system_state = get_system_state()
+    if session_id not in system_state:
+        system_state[session_id] = []
+    system_state[session_id].append({"action": action, "payload": payload, "timestamp": datetime.datetime.now().isoformat()})
+    with open(os.path.join(SCRIPT_DIR, 'system-state.json'), 'w') as f:
+        json.dump(system_state, f, indent=2)
 
 
 def can_dependency_be_ignored(package_name, dep_name):
@@ -140,6 +162,28 @@ def get_dependencies(package_name, version="latest", arch="x86-64", dependencies
     return dependencies
 
 
+async def post_install(package_name, version, arch):
+    # Link everything in f"${DST_DIR}/{package_name}/{version}/lib" to /usr/local/lib
+    # Link everything in f"${DST_DIR}/{package_name}/{version}/include" to /usr/local/include
+    # Link everything in f"${DST_DIR}/{package_name}/{version}/bin" to /usr/local/bin
+    pairs = [
+              ("lib", "/usr/devcontainer.com/lib"), 
+            #   ("include", "/usr/devcontainer.com/include"),
+              ("bin", "/usr/devcontainer.com/bin")
+         ]
+    for src, dst in pairs:
+        os.system(f'sudo mkdir -p {dst}')
+        for root, dirs, files in os.walk(f"{DST_DIR}/{package_name}/v{version}/{src}"):
+            for file in files:
+                # print("Linking", os.path.join(root, file), "to", dst)
+                return_code = os.system(f'sudo ln -s {os.path.join(root, file)} {dst}')
+                if return_code != 0:
+                    # print(f'Error linking {os.path.join(root, file)} to {dst}')
+                    add_system_state(SESSION_ID, "post-install-link", {"package_name": package_name, "version": version, "src": os.path.join(root, file), "dst": dst})
+                    # raise SystemExit(1)
+    add_system_state(SESSION_ID, "post-install", {"package_name": package_name, "version": version})
+
+
 async def plain_install(package_name, version="latest", arch="x86-64"):
     db = get_db()
     if package_name not in db:
@@ -163,6 +207,8 @@ async def plain_install(package_name, version="latest", arch="x86-64"):
                         print('Checksum mismatch')
                         raise SystemExit(1)
                 os.system(f'tar -xzf {os.path.join(tmp_dir, "package.tgz")} -C {DST_DIR} ')
+    add_system_state(SESSION_ID, "install", {"package_name": package_name, "version": version})
+    await post_install(package_name, version, arch)
 
 
 async def install_package(package_name, version="latest", arch="x86-64", check_dependencies=True):
@@ -200,6 +246,8 @@ async def main(package_name=None):
         if len(os.sys.argv) > 1:
             package_name = os.sys.argv[1]
         
+    version = "latest"
+    add_system_state(SESSION_ID, "install-requested", {"package_name": package_name, "version": version})
     await install_package(package_name)
     # Remove DST_DIR recursively
     # os.rmdir(DST_DIR)

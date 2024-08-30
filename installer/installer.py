@@ -5,6 +5,8 @@ import tempfile
 import hashlib
 from functools import cache
 from dataclasses import dataclass
+import uuid
+import datetime 
 
 # import semver
 from packaging.version import Version
@@ -23,6 +25,20 @@ class Dependency:
     version_requirement: str
     from_package: str | None
     from_package_version: str | None
+
+
+def get_system_state():
+    with open(os.path.join(SCRIPT_DIR, 'system-state.json')) as f:
+        return json.load(f)
+
+
+def add_system_state(session_id, action, payload):
+    system_state = get_system_state()
+    if session_id not in system_state:
+        system_state[session_id] = []
+    system_state[session_id].append({"action": action, "payload": payload, "timestamp": datetime.datetime.now().isoformat()})
+    with open(os.path.join(SCRIPT_DIR, 'system-state.json'), 'w') as f:
+        json.dump(system_state, f, indent=2)
 
 
 @cache
@@ -242,6 +258,9 @@ def main(package_name=None):
         if len(os.sys.argv) > 1:
             package_name = os.sys.argv[1]
         
+    SESSION_ID = uuid.uuid4()
+    version = "latest"
+    add_system_state(SESSION_ID, "install-requested", {"package_name": package_name, "version": version})
     install_package(package_name)
     # Remove DST_DIR recursively
     # os.rmdir(DST_DIR)
