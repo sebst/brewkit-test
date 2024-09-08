@@ -1,0 +1,75 @@
+sections:
+  - name: "Programming Languages"
+    items:
+      - name: "Python"
+        description: "Python is a programming language that lets you work quickly and integrate systems more effectively."
+        url: "https://www.python.org/"
+        packages:
+        - "python.org"
+      - name: "Ruby"
+        description: "Ruby is a dynamic, open source programming language with a focus on simplicity and productivity."
+        url: "https://www.ruby-lang.org/"
+        packages: 
+        - "ruby-lang.org"
+      - name: "PHP"
+        description: "PHP is a popular general-purpose scripting language that is especially suited to web development."
+        url: "https://www.php.net/"
+        packages: 
+        - "php.net"
+      - name: "C#"
+        description: "C# is a general-purpose, multi-paradigm programming language encompassing strong typing, lexically scoped, imperative, declarative, functional, generic, object-oriented, and component-oriented programming disciplines."
+        url: "https://docs.microsoft.com/en-us/dotnet/csharp/"
+        packages: 
+        - "dotnet.microsoft.com"
+      - name: "Go"
+        description: "Go is a statically typed, compiled programming language designed at Google."
+        url: "https://golang.org/"
+        packages: 
+        - "go.dev"
+  - name: "Infrastructure"
+    items:
+      - name: "MySQL"
+        description: "MySQL is an open-source relational database management system."
+        url: "https://www.mysql.com/"
+        packages:
+        - "mysql.com"
+      - name: "PostgreSQL"
+        description: "PostgreSQL is a powerful, open-source object-relational database system."
+        url: "https://www.postgresql.org/"
+        packages:
+        - "postgresql.org"
+  - name: "Web Servers"
+    items:
+      - name: "Apache HTTP Server"
+        description: "The Apache HTTP Server Project is an effort to develop and maintain an open-source HTTP server for modern operating systems including UNIX and Windows."
+        url: "https://httpd.apache.org/"
+        packages:
+        - "apache.org/httpd"
+      - name: "Nginx"
+        description: "Nginx is a web server that can also be used as a reverse proxy, load balancer, mail proxy, and HTTP cache."
+        url: "https://www.nginx.com/"
+        packages:
+        - "nginx.org"
+  - name: "Developer Tools"
+    items:
+      - name: "Git"
+        description: "Git is a distributed version control system for tracking changes in source code during software development."
+        url: "https://git-scm.com/"
+        packages:
+        - "git-scm.com"
+      - name: "Docker"
+        description: "Docker is a set of platform as a service products that use OS-level virtualization to deliver software in packages called containers."
+        url: "https://www.docker.com/"
+        packages:
+        - "docker.com/cli"
+      - name: "Kubernetes"
+        description: "Kubernetes is an open-source container-orchestration system for automating computer application deployment, scaling, and management."
+        url: "https://kubernetes.io/"
+        packages:
+        - "kubernetes.io/minikube"
+        - "kubernetes.io/kubectl"
+      - name: "fzf"
+        description: "A command-line fuzzy finder written in Go."
+        url: "https://github.com/junegunn/fzf"
+        packages:
+        - "github.com/junegunn/fzf"

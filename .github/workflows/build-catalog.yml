@@ -19,11 +19,13 @@ jobs:
                 mkdir -p dist || true
                 touch dist/packages.json
                 yaml2json < packages.yml > dist/packages.json
+                yaml2json < wizard.yml > dist/wizard.json
             - name: Commit changes
               run: |
                 git config --global user.email "robot@bascodes.com"
                 git config --global user.name "Robot"
                 git add -f catalog/dist/packages.json
+                git add -f catalog/dist/wizard.json
                 git add .
                 git commit -m "Sync `pkgx.dev` pantry" || exit 0
                 git push
