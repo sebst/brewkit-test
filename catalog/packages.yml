@@ -1,0 +1,15 @@
+- name: apache.org/httpd
+  logo: apache.org/httpd.svg
+  title: Apache HTTP Server
+  description: The Apache HTTP Server Project is an effort to develop and maintain an open-source HTTP server for modern operating systems including UNIX and Windows. The goal of this project is to provide a secure, efficient and extensible server that provides HTTP services in sync with the current HTTP standards.
+  website: https://httpd.apache.org/
+- name: python.org
+  logo: python.org.svg
+  title: Python
+  description: Python is a programming language that lets you work quickly and integrate systems more effectively.
+  website: https://www.python.org/
+- name: php.net
+  logo: php.net.svg
+  title: PHP
+  description: PHP is a popular general-purpose scripting language that is especially suited to web development.
+  website: https://www.php.net/

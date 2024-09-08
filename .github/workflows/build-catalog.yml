@@ -1,0 +1,26 @@
+name: Build Catalog
+on:
+    workflow_dispatch:
+
+jobs:
+    packages:
+        runs-on: ubuntu-latest
+        steps:
+            
+            - uses: actions/checkout@v2
+            - name: Setup yaml2json
+              run: |
+                wget https://github.com/bronze1man/yaml2json/releases/download/v1.3.3/yaml2json_linux_amd64 -O yaml2json
+                chmod +x yaml2json
+                sudo mv yaml2json /usr/local/bin/
+            - name: Convert packages.yml to packages.json
+              run: |
+                cd catalog
+                yaml2json < packages.yml > dist/packages.json
+            - name: Commit changes
+              run: |
+                git config --global user.email "robot@bascodes.com"
+                git config --global user.name "Robot"
+                git add .
+                git commit -m "Sync `pkgx.dev` pantry" || exit 0
+                git push
