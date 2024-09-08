@@ -1,6 +1,6 @@
 sections:
   - name: "Programming Languages"
-    items:
+    packageSelection:
       - name: "Python"
         description: "Python is a programming language that lets you work quickly and integrate systems more effectively."
         url: "https://www.python.org/"
@@ -27,7 +27,7 @@ sections:
         packages: 
         - "go.dev"
   - name: "Infrastructure"
-    items:
+    packageSelection:
       - name: "MySQL"
         description: "MySQL is an open-source relational database management system."
         url: "https://www.mysql.com/"
@@ -39,7 +39,7 @@ sections:
         packages:
         - "postgresql.org"
   - name: "Web Servers"
-    items:
+    packageSelection:
       - name: "Apache HTTP Server"
         description: "The Apache HTTP Server Project is an effort to develop and maintain an open-source HTTP server for modern operating systems including UNIX and Windows."
         url: "https://httpd.apache.org/"
@@ -51,7 +51,7 @@ sections:
         packages:
         - "nginx.org"
   - name: "Developer Tools"
-    items:
+    packageSelection:
       - name: "Git"
         description: "Git is a distributed version control system for tracking changes in source code during software development."
         url: "https://git-scm.com/"
