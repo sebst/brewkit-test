@@ -16,7 +16,7 @@ jobs:
             - name: Convert packages.yml to packages.json
               run: |
                 cd catalog
-                yaml2json < packages.yml > dist/packages.json
+                yaml2json < packages.yml 
             - name: Commit changes
               run: |
                 git config --global user.email "robot@bascodes.com"
