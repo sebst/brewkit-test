@@ -6,6 +6,12 @@ sections:
         url: "https://www.python.org/"
         packages:
         - "python.org"
+        recommends:
+        - "astral.sh/uv"
+        - "astral.sh/ruff"
+        - "python-poetry.org"
+        - "mypy-lang.org"
+        - "pre-commit.com"
       - name: "Ruby"
         description: "Ruby is a dynamic, open source programming language with a focus on simplicity and productivity."
         url: "https://www.ruby-lang.org/"
