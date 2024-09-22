@@ -5,11 +5,11 @@ sections:
       - id: "TARGET_ARCHS"
         name: "Target Architectures"
         description: "The processor architectures to target."
-        default: ["x86_64", "arm64"]
+        default: ['x86-64', 'arm64']
         input:
           multiSelect:
-            - x86_64
-            - arm64
+            - 'x86-64'
+            - 'arm64'
       - id: "NAME"
         name: "Name"
         description: "The name of the devcontainer."
