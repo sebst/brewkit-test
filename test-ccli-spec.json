@@ -1,0 +1,9 @@
+{
+  "packages": [
+    {
+      "name": "stedolan.github.io/jq",
+      "version": "latest"
+    }
+  ]
+}
+  
