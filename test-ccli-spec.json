@@ -1,8 +1,8 @@
 {
   "packages": [
     {
-      "name": "stedolan.github.io/jq",
-      "version": "latest"
+      "name": "python.org",
+      "version": "3.12"
     }
   ]
 }
