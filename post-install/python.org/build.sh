@@ -14,6 +14,7 @@ cat << 'EOF' > /var/devcontainer.com/python.org.start.sh
 
 python -m http.server -d /var/www/html
 EOF
+chmod +x /var/devcontainer.com/python.org.start.sh
 
 
 
