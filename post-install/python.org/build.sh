@@ -18,5 +18,5 @@ EOF
 
 
 echo "--- Adding Service"
-echo "python: /var/devcontainer.com/python.org.start.sh" >> /workspaces/testcontainer/services.proc
+echo "python: /var/devcontainer.com/python.org.start.sh" >> /var/devcontainer.com/services.proc
 
