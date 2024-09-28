@@ -24,7 +24,7 @@ sections:
           text:
       - id: 'REPO_LOCATION'
         name: 'Repository Location'
-        description: 'The location to clone the repository to.''
+        description: 'The location to clone the repository to.'
         default: '/tmp/cli/cli'
         input:
           text:
