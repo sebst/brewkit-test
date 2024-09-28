@@ -15,19 +15,19 @@ sections:
         description: 'The name of the devcontainer.'
         default: 'My Dev Container'
         input:
-          text:
+          text: []
       - id: 'REPO_URL'
         name: 'Repository URL'
         description: 'The URL of the repository to clone.'
         default: 'https://github.com/cli/cli.git'
         input:
-          text:
+          text: []
       - id: 'REPO_LOCATION'
         name: 'Repository Location'
         description: 'The location to clone the repository to.'
         default: '/tmp/cli/cli'
         input:
-          text:
+          text: []
 
   - name: 'Programming Languages'
     repeatable: true
