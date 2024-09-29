@@ -70,6 +70,15 @@ install \
     "${POSTGRESQL_CONFIG_DIR}/pg_hba.conf.d" \
     "${POSTGRESQL__log_directory}"
 
+# install \
+#     --mode=2770 \
+#     --owner="${postgresql_user_name}" \
+#     --group="${postgresql_group_name}" \
+#     "${POSTGRESQL_CONFIG_DIR}/postgresql.conf"
+touch "${POSTGRESQL_CONFIG_DIR}/postgresql.conf"
+chown "${postgresql_user_name}:${postgresql_group_name}" "${POSTGRESQL_CONFIG_DIR}/postgresql.conf"
+chmod 660 "${POSTGRESQL_CONFIG_DIR}/postgresql.conf"
+
 # TODO: if "locale -a" does not contain
 locale-gen "en_US.UTF-8"
 

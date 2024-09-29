@@ -5,8 +5,8 @@
       "version": "3.12"
     },
     {
-      "name": "postgresql.org",
-      "version": "16.1"
+      "name": "redis.io",
+      "version": "7.4"
     }
   ]
 }
