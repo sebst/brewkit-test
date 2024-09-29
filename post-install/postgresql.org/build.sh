@@ -86,6 +86,7 @@ echo "--- Adding Start Script"
 cat << 'EOF' > /var/devcontainer.com/postgresql.org.start.sh
 #!/usr/bin/env -S bash --noprofile --norc -o errexit -o pipefail -o noclobber -o nounset -o allexport
 
+POSTGRESQL_CONFIG_DIR="/var/run/postgresql/config"
 sudo -u postgres postgres -D "${POSTGRESQL_CONFIG_DIR}" 
 EOF
 chmod +x /var/devcontainer.com/postgresql.org.start.sh
