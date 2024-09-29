@@ -3,6 +3,10 @@
     {
       "name": "python.org",
       "version": "3.12"
+    },
+    {
+      "name": "postgresql.org",
+      "version": "16.1"
     }
   ]
 }
