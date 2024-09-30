@@ -2,10 +2,10 @@
 
 
 echo "--- Installing webserver"
-sudo mkdir -p /var/lib/html
-sudo chmod -R a+rw /var/lib/html
-sudo rm /var/lib/html/index.html
-echo "Hello World" > /var/lib/html/index.html
+sudo mkdir -p /var/www/html
+sudo chmod -R a+rw /var/www/html
+sudo rm /var/www/html/index.html
+echo "Hello World" > /var/www/html/index.html
 
 
 echo "--- Adding Start Script"
