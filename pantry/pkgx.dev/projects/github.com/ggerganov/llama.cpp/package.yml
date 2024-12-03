@@ -30,6 +30,7 @@ build:
     git-scm.org: '*'
     curl.se: '*'
     python.org: ~3.11
+    cmake.org: 3
     linux/aarch64:
       kernel.org/linux-headers: '*' # hwcap.h
   env:
@@ -51,7 +52,16 @@ build:
         // missing include for linux/aarch64 -- HWCAP2_I8MM\\
         #include <asm/hwcap.h>
 
-    - make --jobs {{hw.concurrency}}
+    - run: make --jobs {{hw.concurrency}}
+      if: <4242
+    # *** The Makefile build is deprecated. Use the CMake build instead.
+    # For more details, see https://github.com/ggerganov/llama.cpp/blob/master/docs/build.md.
+    # Stop.
+    - run:
+        - cmake -B build
+        - cmake --build build --config Release
+        - cmake --install build --prefix {{prefix}}
+      if: '>=4242'
 
     # https://github.com/ggerganov/llama.cpp/blob/master/examples/deprecation-warning/README.md
     - |
@@ -63,6 +73,8 @@ build:
         install -D main {{prefix}}/bin/llama.cpp
         # new name
         ln -s llama.cpp {{prefix}}/bin/llama-cli
+      elif test -f {{prefix}}/bin/llama-cli; then
+        ln -s llama-cli {{prefix}}/bin/llama.cpp
       else
         echo "No binary found"
         exit 1
@@ -82,9 +94,10 @@ build:
         exit 1
       fi
 
-    - |
-      mkdir -p {{prefix}}/share
-      mv prompts {{prefix}}/share
+    - run:
+        - mkdir -p {{prefix}}/share
+        - mv prompts {{prefix}}/share
+      if: <4242
 
     - |
       if test -f convert.py; then
@@ -98,21 +111,19 @@ build:
         false
       fi
 
-    - |
-      bkpyvenv stage {{prefix}} {{version}}
-      $VIRTUAL_ENV/bin/pip install -r requirements.txt
-      bkpyvenv seal {{prefix}} convert.py
+    - bkpyvenv stage {{prefix}} {{version}}
+    - $VIRTUAL_ENV/bin/pip install -r requirements.txt
+    - bkpyvenv seal {{prefix}} convert.py
 
-test: |
+test:
   # broke in v2453
-  if test {{version.major}} -lt 2453; then
-    llama.cpp --help
-  elif test {{version.major}} -lt 3368; then
-    llama.cpp --version
+  - run: llama.cpp --help
+    if: <2453
+  - run: llama.cpp --version
+    if: '>=2453<3368'
   # llama.cpp deprecated in v3368
-  else
-    llama-cli --version
-  fi
+  - run: llama-cli --version
+    if: '>=3368'
   # ^^ testing more than this requires downloading the models 😬
 
 entrypoint: ./entrypoint.sh
