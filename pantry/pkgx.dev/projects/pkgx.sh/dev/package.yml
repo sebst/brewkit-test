@@ -7,11 +7,11 @@ display-name: dev
 versions:
   github: pkgxdev/dev
 
-# strictly needed but breaks `dev` as it needs a virgin env
-# dependencies:
-# pkgx.sh: ^1,^2
+dependencies:
+  pkgx.sh: ^1,^2
 
 build:
+  - echo 'export default "{{version}}"' > ./src/app-version.ts
   - mkdir -p {{prefix}}/bin {{prefix}}/share/pkgx/dev
   - cp -r ./app.ts src deno.json deno.lock {{prefix}}/share/pkgx/dev
   - run:
@@ -20,8 +20,7 @@ build:
     prop: |
       #!/bin/sh
       d="$(cd "$(dirname $0)"/.. && pwd)"
-      deno="$(pkgx +deno -- which deno)"
-      exec "$deno" run -A "$d/share/pkgx/dev/app.ts" "$@"
+      exec "$d/share/pkgx/dev/app.ts" "$@"
 provides:
   - bin/dev
 
@@ -35,3 +34,5 @@ test:
     - echo '{}' > deno.json
     - dev
     - deno --version
+    - test "$(dev --version)" = 'dev {{version}}'
+
