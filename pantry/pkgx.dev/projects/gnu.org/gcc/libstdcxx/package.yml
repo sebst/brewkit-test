@@ -7,23 +7,23 @@ versions:
   strip: /^releases\/gcc-/
 
 dependencies:
-  gnu.org/binutils: '*' # linker needs `as`
-  gnu.org/gmp: '>=4.2'
-  gnu.org/mpfr: '>=2.4.0'
-  gnu.org/mpc: '>=0.8.0'
+  gnu.org/binutils: "*" # linker needs `as`
+  gnu.org/gmp: ">=4.2"
+  gnu.org/mpfr: ">=2.4.0"
+  gnu.org/mpc: ">=0.8.0"
   zlib.net: ^1.3
+  darwin/x86-64: # since 15.1.0
+    libisl.sourceforge.io: ^0
 
 build:
   dependencies:
     linux:
-      gnu.org/gcc: '*'
-    gnu.org/make: '*'
-    perl.org: '^5.6.1'
-    gnu.org/patch: '*'
-    curl.se: '*'
-    github.com/westes/flex: '*'
-    darwin/x86-64: # since 15.1.0
-      libisl.sourceforge.io: ^0
+      gnu.org/gcc: "*"
+    gnu.org/make: "*"
+    perl.org: "^5.6.1"
+    gnu.org/patch: "*"
+    curl.se: "*"
+    github.com/westes/flex: "*"
   working-directory: build
   script:
     # Applying ians patches on x86-64 too, since he sometimes gets fixes in faster, like:
@@ -158,6 +158,13 @@ test:
         - -cxx-isystem {{prefix}}/include/c++/{{version.major}}/*-apple-darwin*
         - -stdlib=libstdc++
   script:
+    # macOS 14 and lower have libc++ issues.
+    - run:
+        - if test "{{hw.platform}}/{{hw.arch}}" = "darwin/x86-64" && test "$(sw_vers -productVersion | cut -d . -f 1)" -lt 15; then
+        - echo "Skipping test on darwin/x86-64 macOS < 15"
+        - exit 0
+        - fi
+      if: ">=15.2"
     - run: clang++ -o test $FIXTURE $FLAGS
       fixture:
         extname: cc
