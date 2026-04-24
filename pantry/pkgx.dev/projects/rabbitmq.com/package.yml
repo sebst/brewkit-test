@@ -10,6 +10,7 @@ warnings:
 
 dependencies:
   erlang.org: 26
+  openssl.org: ^1.1
   linux:
     # since v4.2.4 for GCC_12.0.0 and GLIBCXX_3.4.29
     gnu.org/gcc: 14
@@ -39,9 +40,16 @@ provides:
 test:
   env:
     RABBITMQ_MNESIA_BASE: $PWD/var/lib/rabbitmq/mnesia
+    RABBITMQ_NODENAME: rabbit@localhost
+    LANG: C.UTF-8
+    LC_ALL: C.UTF-8
   script:
+    # clean up orphaned stuff
     - killall rabbitmq-server || true
-    - rabbitmq-server -detached
+    - killall epmd || true
+    - killall beam.smp || true
+    - rabbitmq-server &
+    - sleep 5
     - rabbitmqctl await_startup --timeout 60
     - rabbitmqctl status 2>&1 | tee out
     - grep "Virtual host count" out
