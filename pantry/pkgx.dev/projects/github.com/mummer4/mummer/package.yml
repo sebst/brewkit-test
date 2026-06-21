@@ -1,0 +1,98 @@
+distributable:
+  # release tarball ships pre-generated `configure` + yaggo outputs -> no Ruby/yaggo/autoreconf needed
+  url: https://github.com/mummer4/mummer/releases/download/v{{version}}/mummer-{{version}}.tar.gz
+  strip-components: 1
+
+versions:
+  github: mummer4/mummer
+  ignore: # track stable only; skip alpha/beta/rc release candidates
+    - /alpha/
+    - /beta/
+    - /rc/
+
+runtime:
+  env:
+    PERL5LIB: "{{prefix}}/lib/mummer:$PERL5LIB"
+
+dependencies:
+  perl.org: "*" # nucmer/promer/dnadiff/mummerplot perl wrappers
+  linux:
+    gnu.org/gcc/libstdcxx: 14 # GLIBCXX at runtime
+    gnu.org/gcc/libgomp: "*" # OpenMP (-fopenmp) runtime
+
+build:
+  dependencies:
+    linux:
+      gnu.org/gcc: 14
+  script:
+    - ./configure --prefix={{prefix}}
+    - make --jobs {{ hw.concurrency }}
+    - make install
+
+    # --- post-install fixups ---
+    # 1) the perl wrappers (promer/dnadiff/mummerplot — nucmer & the rest are ELF
+    #    and brewkit relocates those) bake their build perl as the shebang and
+    #    absolute build-prefix paths for `use lib`, the bundled Foundation.pm,
+    #    and the helper binaries (@LIB_DIR@/@BIN_DIR@/@LIBEXEC_DIR@). brewkit does
+    #    NOT rewrite paths inside text scripts, so at the relocated runtime prefix
+    #    those /opt build paths don't exist -> Foundation.pm + "critical files"
+    #    failures. Make the wrappers self-locating via FindBin (RealBin = the
+    #    script's own bin/), so every path resolves relative to wherever the
+    #    package is installed. `use FindBin` is inserted *before* `use lib` so the
+    #    compile-time `use lib "$FindBin::RealBin/.."` sees a populated RealBin.
+    #    (Do NOT sed nucmer: it's a binary — stripping bytes segfaults it.)
+    - run:
+        - for s in promer dnadiff mummerplot; do
+        - test -f "$s" || continue
+        - sed -i -f $PROP "$s"
+        - done
+      prop: |
+        1s|^#!.*perl.*|#!/usr/bin/env perl|
+        /^use lib /i use FindBin;
+        s|^use lib .*|use lib "$FindBin::RealBin/../lib/mummer";|
+        s|^my $BIN_DIR *=.*|my $BIN_DIR = "$FindBin::RealBin";|
+        s|^my $SCRIPT_DIR *=.*|my $SCRIPT_DIR = "$FindBin::RealBin/../lib/mummer";|
+        s|^my $AUX_BIN_DIR *=.*|my $AUX_BIN_DIR = "$FindBin::RealBin/../libexec/mummer";|
+      working-directory: "{{prefix}}/bin"
+
+    # 2) upstream bug (4.0.1): scripts/promer.pl uses unsubstituted tool-name
+    #    placeholders (@MUMMER@/@MGAPS@/...). The path placeholders are already
+    #    handled by the FindBin rewrite above; only the bare tool names remain.
+    - run: if test -f promer; then sed -i -f $PROP promer; fi
+      prop: |
+        s,@MUMMER@,mummer,g
+        s,@MGAPS@,mgaps,g
+        s,@PREPRO@,prepro,g
+        s,@POSTPRO@,postpro,g
+        s,@SHOWCOORDS@,show-coords,g
+      working-directory: "{{prefix}}/bin"
+
+provides:
+  - bin/mummer
+  - bin/nucmer
+  - bin/promer
+  - bin/delta-filter
+  - bin/show-coords
+  - bin/show-aligns
+  - bin/show-snps
+  - bin/show-tiling
+  - bin/show-diff
+  - bin/dnadiff
+  - bin/mummerplot
+  - bin/repeat-match
+  - bin/exact-tandems
+  - bin/combineMUMs
+  - bin/annotate
+
+test:
+  env:
+    PERL5LIB: "{{prefix}}/lib/mummer:$PERL5LIB"
+  script:
+    - (nucmer --version 2>&1 || true) | grep '{{version.raw}}'
+    # real alignment: two near-identical sequences -> expect a 100.00% identity row
+    - nucmer a.fa b.fa -p out
+    - show-coords out.delta | grep '100.00'
+    - mummer -mum a.fa b.fa | grep seqB
+    # exercise a perl wrapper (validates shebang fixup + perl runtime dep)
+    - dnadiff a.fa b.fa -p dd
+    - grep '100.0000' dd.report
