@@ -3,7 +3,7 @@ distributable:
   strip-components: 1
 
 versions:
-  github: containers/podman/releases/tags
+  github: containers/podman
 
 provides:
   linux:
@@ -14,26 +14,32 @@ provides:
     - bin/podman-remote
     - bin/podman-mac-helper
 
+platforms:
+  - linux
+  # dropped support for darwin/x86-64 in v6
+  # added podman.io/v5 to continue to support the old gear.
+  - darwin/aarch64
+
 dependencies:
-  qemu.org: '*'
-  github.com/containers/gvisor-tap-vsock: '*'
+  qemu.org: "*"
+  github.com/containers/gvisor-tap-vsock: "*"
   darwin:
-    github.com/crc-org/vfkit: '*'
+    github.com/crc-org/vfkit: "*"
 
 companions:
-  openssh.com: '*' # ssh-keygen
+  openssh.com: "*" # ssh-keygen
 
 build:
   dependencies:
-    go.dev: =1.24.2 # as of 5.7
-    gnu.org/coreutils: '*'
+    go.dev: =1.25.6 # as of 6.0
+    gnu.org/coreutils: "*"
   script:
     # podman searches a compile-time configured set of paths for helper binaries
     # so we add a relative lookup for the major version of gvproxy we require
     - run: LOC=vendor/github.com/containers/common/pkg/config
       if: <5.7
     - run: LOC=vendor/go.podman.io/common/pkg/config
-      if: '>=5.7'
+      if: ">=5.7"
     - run: sed -i -f $PROP $LOC/config_{darwin,linux}.go
       prop: |-
         s_\(^var defaultHelperBinariesDir.*\)_\
@@ -42,15 +48,15 @@ build:
     - mkdir -p "{{ prefix }}"/bin
     - make --jobs {{ hw.concurrency }} podman-remote
 
-    - run: |
-        mv bin/podman-remote "{{ prefix }}"/bin/
-        ln -s podman-remote "{{ prefix }}"/bin/podman
+    - run:
+        - mv bin/podman-remote "{{ prefix }}"/bin/
+        - ln -s podman-remote "{{ prefix }}"/bin/podman
       if: linux
 
-    - run: |
-        make --jobs {{ hw.concurrency }} podman-mac-helper
-        mv bin/darwin/podman{-mac-helper,} "{{ prefix }}"/bin/
-        ln -s podman "{{ prefix }}"/bin/podman-remote
+    - run:
+        - make --jobs {{ hw.concurrency }} podman-mac-helper
+        - mv bin/darwin/podman{-mac-helper,} "{{ prefix }}"/bin/
+        - ln -s podman "{{ prefix }}"/bin/podman-remote
       if: darwin
   env:
     CGO_ENABLED: 0 # since 5.5.0
@@ -62,10 +68,7 @@ test:
   - (podman info 2>&1 || true) | grep "Cannot connect to Podman."
 
   # won't run as root
-  - |
-    if test $(id -g) = 0; then
-      exit 0
-    fi
+  - if test $(id -g) = 0; then exit 0; fi
 
   # error message changed in v5
   - "(podman machine init --image-path fake-testimage fake-testvm 2>&1 || true) | grep -E 'Error: (open|stat|faccessat) fake-testimage: no such file or directory'"
