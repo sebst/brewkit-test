@@ -10,16 +10,17 @@ dependencies:
   libjpeg-turbo.org: 2
   libarchive.org: 3
   github.com/libass/libass: ^0.17
-  videolan.org/libplacebo: 6
+  videolan.org/libplacebo: ^7.387
   littlecms.com: 2
   luajit.org: 2
   mujs.com: 1
   freedesktop.org/uchardet: 0
   vapoursynth.com: 66
   yt-dlp.org: '*'
+  curl.se: '*' # 0.42's libcurl stream backend
   linux:
     alsa-project.org/alsa-lib: 1
-    github.com/adah1972/libunibreak: 6
+    gnu.org/libiconv: 1 # meson finds it (via git/gettext) over glibc's iconv
 
 warnings:
   - macOS12+
