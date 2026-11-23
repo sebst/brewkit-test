@@ -20,8 +20,11 @@ build:
     # of *every* recipe, so the `$(MAKE) -C src install` recursion no longer sees
     # ours and src/Makefile falls back to its own /usr/local default. passing it
     # on the command line survives the recursion via MAKEOVERRIDES.
+    # 8.12 made `install` also build the bundled modules, which need python3 and
+    # more. pantry ships only the server and CLI, so DEPLOY_ARGS=redis builds core
+    # only (older versions ignore the variable).
     # TODO: configure default redis.conf if necessary
-    - make install PREFIX="{{prefix}}"
+    - make install PREFIX="{{prefix}}" DEPLOY_ARGS=redis
   env:
     BUILD_TLS: yes
     linux/x86-64:
@@ -34,6 +37,11 @@ build:
 
 test:
   - redis-server --daemonize yes
+  - |
+    # --daemonize returns before the server listens (debian buster CI hit
+    # "Connection refused" on the next command); wait until it answers
+    for i in $(seq 50); do redis-cli --raw ping >/dev/null 2>&1 && break; sleep 0.2; done
+    redis-cli --raw ping
   - redis-cli --raw SET key123 value123
 
   - test "$(redis-cli --raw GET key123)" = "value123"
